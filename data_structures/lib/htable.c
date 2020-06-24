@@ -36,9 +36,10 @@ void htable_destroy(Htable *htable) {
 	free(htable);
 }
 
-void htable_insert(Htable *htable, void *data) {
+int htable_insert(Htable *htable, void *data) {
 	int index = htable->hash_function(data) % htable->size;
 	htable->base[index] = list_insert(htable->base[index], data);
+	return htable->base[index];
 }
 
 void htable_remove(Htable *htable, const void *key) {
