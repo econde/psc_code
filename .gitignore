@@ -1,0 +1,15 @@
+a.out
+*~
+*.o
+*.lst
+*.bin
+*.elf
+*.hex
+*.bak
+*.ii
+*.i
+*.d
+*.map
+*.a
+*.pdf
+*.zip
