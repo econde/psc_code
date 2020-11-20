@@ -22,8 +22,8 @@ typedef struct List_Node {
 	Representa um utente na fila de espera
  */
 typedef struct User {
-	char *name;
 	time_t arrival;
+	char *name;
 } User;
 
 /*-----------------------------------------------------------------------------
@@ -106,7 +106,8 @@ void user_print() {
 		return;
 	}
 	for (List_node *node = queue.next; node != &queue; node = node->next)
-		printf("Nome: %s\n", ((User *)node->data)->name);
+		printf("Nome: %s, %ld\n", ((User *)node->data)->name,
+				time(NULL) - ((User *)node->data)->arrival);
 }
 
 /*-----------------------------------------------------------------------------

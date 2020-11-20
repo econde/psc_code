@@ -1,21 +1,23 @@
 /*
 	Programa para simular uma fila de espera
 
-	Objectivo: exemplificar a utilização de uma lista ligada 
+	Objectivo: exemplificar a utilização de uma lista ligada
 				e a alocação dinâmica.
-	
+
 	Criando diretamente uma lista simplesmente ligada
 */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 /*-----------------------------------------------------------------------------
 	Representa um utente na fila de espera
  */
 typedef struct User {
 	struct User *next;
+	time_t arrival;
 	char *name;
 } User;
 
@@ -40,7 +42,7 @@ static void user_insert(char *name) {
 		exit(-1);
 	}
 	strcpy(user->name, name);
-
+	time(&user->arrival);
 	user->next = NULL;
 	if (NULL == head)
 		head = tail = user;
@@ -53,7 +55,7 @@ static void user_insert(char *name) {
 /*-----------------------------------------------------------------------------
 	Função para remover da fila o primeiro utente a ser atendido
  */
-char * user_answer() {
+char *user_answer() {
 	if (NULL == head)
 		return NULL;
 	User *user = head;
@@ -98,7 +100,7 @@ void user_print() {
 	}
 	int i = 1;
 	for (User *user = head; user != NULL; user = user->next)
-		printf("%d: %s\n", i++, user->name);
+		printf("%d: %s, %ld\n", i++, user->name, time(NULL) - user->arrival);
 }
 
 /*-----------------------------------------------------------------------------

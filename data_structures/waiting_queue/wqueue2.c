@@ -9,12 +9,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 /*-----------------------------------------------------------------------------
 	Representa um utente na fila de espera
  */
 typedef struct User {
 	struct User *next, *prev;
+	time_t arrival;
 	char *name;
 } User;
 
@@ -39,6 +41,7 @@ static void user_insert(char *name) {
 		exit(-1);
 	}
 	strcpy(user->name, name);
+	time(&user->arrival);
 
 	user->prev = queue.prev;
 	user->next = &queue;
@@ -55,7 +58,7 @@ char *user_answer() {
 	User *user = queue.next;
 	user->next->prev = user->prev;
 	user->prev->next = user->next;
-	
+
 	char *name = user->name;
 	free(user);
 	return name;
@@ -87,7 +90,7 @@ void user_print() {
 	}
 	int i = 1;
 	for (User *user = queue.next; user != &queue; user = user->next)
-		printf("%d: %s\n", i++, user->name);
+		printf("%d: %s, %ld\n", i++, user->name, time(NULL) - user->arrival);
 }
 
 /*-----------------------------------------------------------------------------

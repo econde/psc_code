@@ -3,7 +3,7 @@
 
 	Objectivo: exemplificar a utilização de uma lista ligada
 				e a alocação dinâmica.
-	
+
 	Usando lista não intrusiva duplamente ligada com sentinela
 	implementada em separado
 */
@@ -18,12 +18,12 @@
 	Representa um utente na fila de espera
  */
 typedef struct User {
-	char *name;
 	time_t arrival;
+	char *name;
 } User;
 
 /*-----------------------------------------------------------------------------
-	A fila de espera 
+	A fila de espera
  */
 static List_node *queue;
 
@@ -86,7 +86,8 @@ static void user_remove(char *name) {
  */
 
 static void print(void *user) {
-	printf("%s\n", ((User *)user)->name);
+	printf("Nome: %s, %ld\n", ((User *)user)->name,
+			time(NULL) - ((User *)user)->arrival);
 }
 
 void user_print() {
