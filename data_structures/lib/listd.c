@@ -32,7 +32,7 @@ int list_insert_sort(List_node *node, void *data,
 List_node *list_search(List_node *node, void *data,
 					   int (*comp) (const void*, const void*)) {
 	List_node *p;
-	for (p = node->next; p != node && comp(p->data, data) > 0; p = p->next)
+	for (p = node->next; p != node && comp(p->data, data) != 0; p = p->next)
 		;
 	return p;
 }
