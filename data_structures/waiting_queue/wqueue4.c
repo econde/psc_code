@@ -66,7 +66,7 @@ char *user_answer() {
 	Função para remover um utente da fila de espera, por desistencia
  */
 static int cmp(const void *a, const void *b) {
-	return strcmp(((User *)a)->name, (char *)b);
+	return strcmp(((User *)a)->name, (char *)b) == 0;
 }
 
 static void user_remove(char *name) {
