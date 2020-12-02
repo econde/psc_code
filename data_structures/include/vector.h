@@ -11,7 +11,7 @@ Vector *vector_create(int chunk);
 void vector_destroy(Vector *);
 
 size_t vector_sorted_search(Vector *vector, void *key,
-							int (*cmp)(const void *, const void *), size_t *result);
+							int (*cmp)(const void *, const void *), size_t *index);
 
 size_t vector_search(Vector *vector, void *key,
 					int (*cmp)(const void *, const void *));

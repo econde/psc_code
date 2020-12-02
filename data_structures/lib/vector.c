@@ -23,13 +23,13 @@ void vector_destroy(Vector *vector) {
 	free(vector);
 }
 
-/*	retorna um valor booleano indicando se encontrou
- *	devolve através de result a posição onde encontrou ou deveria encontrar no vetor ordenado
+/*	pesquisa binária sobre vetor ordenado
+ *	retorna um valor booleano indicando se encontrou
+ *	devolve através de index a posição onde encontrou ou deveria encontrar
  */
 size_t vector_sorted_search(Vector *vector, void *key,
-							int (*cmp)(const void *, const void *), size_t *result) {
-	size_t left = 0, right = vector->current_size;
-	size_t middle = (right - left) / 2;
+							int (*cmp)(const void *, const void *), size_t *index) {
+	size_t left = 0, right = vector->current_size, middle = (right - left) / 2;
 	size_t ref = 0;
 	void **buffer = vector->buffer;
 	while (left < right) {
@@ -39,55 +39,16 @@ size_t vector_sorted_search(Vector *vector, void *key,
 		else if (cmp_result > 0)
 			ref = right = middle;
 		else {
-			*result = middle;
+			*index = middle;
 			return 1;
 		}
 		middle = left + (right - left) / 2;
 	}
-	*result = ref;
+	*index = ref;
 	return 0;
 }
 
-/*	retorna a posição onde encontrou ou a dimensão caso não tenha encontrado.
- */
-size_t vector_search(Vector *vector, void *key,
-					int (*cmp)(const void *, const void *)) {
-	void **w = bsearch(&key, vector->buffer, vector->current_size, 
-							sizeof *vector->buffer, cmp);
-	return w != NULL ? w - vector->buffer : vector->current_size;
-}
-
-size_t vector_size(Vector * vector) {
-	return vector->current_size;
-}
-
-void *vector_at(Vector * vector, int index) {
-	return vector->buffer[index];
-}
-
-void *vector_assign(Vector * vector, int index, void * element) {
-	if (vector->current_size <= index)
-		vector->current_size = index + 1;
-	/* falta verificar se é necessário alocar mais memória */
-	return vector->buffer[index] = element;
-}
-
-int vector_insert(Vector *vector, void *element, size_t index) {
-	void **buffer = vector->buffer;
-	if (vector->current_size == vector->max_size) {
-		vector->buffer = buffer = realloc(buffer,
-				(vector->current_size + vector->chunk) * sizeof *buffer);
-		if (NULL == buffer)
-			return 0;
-		vector->max_size += vector->chunk;
-	}
-	memmove(&buffer[index + 1], &buffer[index], (vector->current_size - index) * sizeof *buffer);
-	buffer[index] = element;
-	vector->current_size++;
-	return 1;
-}
-
-int vector_sort_insert(Vector *vector, void *element,
+int vector_sorted_insert(Vector *vector, void *element,
 					int (*cmp)( const void *, const void *)) {
 	size_t left = 0, right = vector->current_size, middle = (right - left) / 2;
 	size_t ref = 0;
@@ -111,6 +72,57 @@ int vector_sort_insert(Vector *vector, void *element,
 	}
 	memmove(&buffer[ref + 1], &buffer[ref], (vector->current_size - ref) * sizeof *buffer);
 	buffer[ref] = element;
+	vector->current_size++;
+	return 1;
+}
+
+/*	pesquisa sequencial
+ *	retorna a posição onde encontrou ou a dimensão caso não tenha encontrado.
+ */
+size_t vector_search(Vector *vector, void *key,
+					int (*cmp)(const void *, const void *)) {
+	for (size_t i = 0; i < vector->current_size; ++i)
+		if (cmp(vector->buffer + i, key))
+			return i;
+	return 0;
+}
+
+size_t vector_size(Vector * vector) {
+	return vector->current_size;
+}
+
+void *vector_at(Vector * vector, int index) {
+	return vector->buffer[index];
+}
+
+void *vector_assign(Vector * vector, int index, void * element) {
+	if (vector->current_size <= index)
+		vector->current_size = index + 1;
+	/* falta verificar se é necessário alocar mais memória */
+	return vector->buffer[index] = element;
+}
+
+int vector_insert(Vector *vector, void *element, size_t index) {
+	void **buffer = vector->buffer;
+	if (index >= vector->current_size) { 
+		if (index >= vector->max_size) {
+			vector->max_size = (index / vector->chunk + 1) * vector->chunk;
+			vector->buffer = buffer = realloc(buffer, vector->max_size * sizeof *buffer);
+			if (NULL == buffer)
+				return 0;
+		}
+		buffer[index] = element;
+		vector->current_size = index + 1;
+		return 1;
+	}	/* index < vector->current_size */
+	if (vector->current_size == vector->max_size) {
+		vector->max_size += vector->chunk;
+		vector->buffer = buffer = realloc(buffer, vector->max_size * sizeof *buffer);
+		if (NULL == buffer)
+			return 0;
+	}
+	memmove(&buffer[index + 1], &buffer[index], (vector->current_size - index) * sizeof *buffer);
+	buffer[index] = element;
 	vector->current_size++;
 	return 1;
 }
