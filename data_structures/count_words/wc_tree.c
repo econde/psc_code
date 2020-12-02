@@ -38,7 +38,7 @@ char *word_read(FILE *fd){
 	} while (strchr(separators, c) == NULL);
 	buffer[i] = '\0';
 	return buffer;
-}		
+}
 
 static inline int min(int a, int b) {
 	return a < b ? a : b;

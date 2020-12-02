@@ -22,20 +22,22 @@ Tree_node *tree_search(Tree_node *node, void *data,
 		return tree_search(node->left, data, cmp);
 }
 
-Tree_node *tree_insert(Tree_node *node, void *data,
+Tree_node *tree_insert(Tree_node *root, void *data,
 						int (*cmp)(void*, void*)) {
-	if (NULL == node) {
-		node = malloc(sizeof *node);
-		if (NULL == node)
+	if (NULL == root) {
+		Tree_node *new_node = malloc(sizeof *new_node);
+		if (NULL == new_node)
 			return NULL;
-		node->left = node->right = NULL;
-		node->data = data;
+		new_node->left = new_node->right = NULL;
+		new_node->data = data;
+		return new_node;
 	}
-	else if (cmp(node->data, data) < 0)
-		node->right = tree_insert(node->right, data, cmp);
-	else 
-		node->left = tree_insert(node->left, data, cmp);
-	return node;
+	int cmp_result = cmp(root->data, data);
+	if (cmp_result < 0)
+		root->right = tree_insert(root->right, data, cmp);
+	else if (cmp_result > 0)
+		root->left = tree_insert(root->left, data, cmp);
+	return root;
 }
 
 size_t tree_size(Tree_node *node)  {
