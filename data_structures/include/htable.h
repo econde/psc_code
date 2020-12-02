@@ -31,10 +31,10 @@ Htable *htable_create(size_t,
 
 void htable_destroy(Htable *);
 
-int htable_insert(Htable *table, void *data);
+int htable_insert(Htable *table, const void *key, void *data);
 
 void htable_remove(Htable *htable, const void *key);
-	
+
 void *htable_search(Htable * htable, const void *key,
 	int (*cmp)(const void *, const void *));
 

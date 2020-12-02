@@ -36,10 +36,10 @@ void htable_destroy(Htable *htable) {
 	free(htable);
 }
 
-int htable_insert(Htable *htable, void *data) {
-	int index = htable->hash_function(data) % htable->size;
+int htable_insert(Htable *htable, const void *key, void *data) {
+	int index = htable->hash_function(key) % htable->size;
 	htable->base[index] = list_insert(htable->base[index], data);
-	return htable->base[index];
+	return htable->base[index] != NULL;
 }
 
 void htable_remove(Htable *htable, const void *key) {
@@ -97,5 +97,5 @@ int htable_collisions(Htable * htable) {
 				max_collisions = collisions;
 		}
 	}
-	return max_collisions - 1; 
+	return max_collisions - 1;
 }

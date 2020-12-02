@@ -6,7 +6,7 @@
 
 unsigned int get_time() {
 	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
 	return ts.tv_sec * 1000 + (ts.tv_nsec / 1000000);
 }
 
@@ -38,7 +38,7 @@ char *word_read(FILE *fd){
 	} while (strchr(separators, c) == NULL);
 	buffer[i] = '\0';
 	return buffer;
-}		
+}
 
 static inline int min(int a, int b) {
 	return a < b ? a : b;
@@ -51,11 +51,11 @@ static inline int min(int a, int b) {
 Htable *htable;
 
 int word_cmp_text(const void *data, const void *b) {
-	return strcmp(((Word *)data)->text, ((Word*)b)->text);
+	return strcmp(((Word *)data)->text, (char*)b);
 }
 
 int hash_function(const void *data) {
-	char *word_text = ((const Word *)data)->text;
+	const char *word_text = data;
 	int hash = 0;
 	while (*word_text)
 		hash += *word_text++;
@@ -80,8 +80,7 @@ int main(int argc, char *argv[]){
 	char *word_text = word_read(fd);
 	while(word_text != NULL) {
 		nwords++;
-		Word key = {.text = word_text};
-		Word *word = htable_lookup(htable, &key);
+		Word *word = htable_lookup(htable, word_text);
 		if (word != NULL) {
 			word->counter++;
 		}
@@ -89,7 +88,7 @@ int main(int argc, char *argv[]){
 			word = malloc(sizeof(Word));
 			word->counter = 1;
 			word->text = strdup(word_text);
-			htable_insert(htable, word);
+			htable_insert(htable, word_text, word);
 		}
 		word_text = word_read(fd);
 	}
