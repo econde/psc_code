@@ -18,7 +18,7 @@ find_bigger:
 for:
     cmp	%rsi, %rdx
     jnb	for_end
-    mov	(%rdi,%rcx,4), %ecx
+    mov	(%rdi,%rdx,4), %ecx
     cmp	%eax, %ecx
     jle	if_end
     mov	%ecx, %eax
