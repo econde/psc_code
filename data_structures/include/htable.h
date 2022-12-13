@@ -35,9 +35,6 @@ int htable_insert(Htable *table, const void *key, void *data);
 
 void htable_remove(Htable *htable, const void *key);
 
-void *htable_search(Htable * htable, const void *key,
-	int (*cmp)(const void *, const void *));
-
 void *htable_lookup(Htable *htable, const void *key);
 
 void htable_foreach(Htable *, void (*do_it)(void*));

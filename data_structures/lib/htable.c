@@ -1,9 +1,9 @@
 /*	Instituto Superior de Engenharia de Lisboa
-	Ezequiel Conde, 2010
+	Ezequiel Conde, 2022
 */
 #include "htable.h"
 
-void htable_init(Htable * htable, size_t size,
+void htable_init(Htable *htable, size_t size,
 				int (*hf)(const void *),
 				int (*kf)(const void *, const void *)) {
 	htable->hash_function = hf;
@@ -58,17 +58,6 @@ void *htable_lookup(Htable *htable, const void *key) {
 		return NULL;
 	List_node *node = list_search(htable->base[index],
 									key, htable->key_function);
-	if (node != NULL)
-		return list_data(node);
-	return NULL;
-}
-
-void *htable_search(Htable *htable, const void *key,
-	int (*cmp)(const void *, const void *)) {
-	int index = htable->hash_function(key) % htable->size;
-	if (NULL == htable->base[index])
-		return NULL;
-	List_node *node = list_search(htable->base[index], key, cmp);
 	if (node != NULL)
 		return list_data(node);
 	return NULL;
