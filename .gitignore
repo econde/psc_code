@@ -13,3 +13,11 @@ a.out
 *.a
 *.pdf
 *.zip
+cword_list
+cword_htable
+cword_tree
+cword_vector
+.gitignore
+Maias_20001210.txt
+
+

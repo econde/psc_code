@@ -2,11 +2,11 @@
 #define VECTOR_H
 
 typedef struct Vector {
-	void **buffer;
-	size_t current_size, max_size, chunk;
+	void *buffer;
+	size_t element_size, current_size, max_size, chunk_size;
 } Vector;
 
-Vector *vector_create(int chunk);
+Vector *vector_create(size_t element_size, size_t chunk_size);
 
 void vector_destroy(Vector *);
 
@@ -32,7 +32,8 @@ int vector_sort_remove(Vector *vector, void *element,
 
 void vector_foreach(Vector *vector, void(*do_it)(void *));
 
-void * vector_at(Vector * vector, int index);
-void * vector_assign(Vector * vector, int index, void * element);
+void *vector_at(Vector * vector, int index);
+
+void *vector_assign(Vector * vector, int index, void * element);
 
 #endif
