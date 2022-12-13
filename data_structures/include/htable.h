@@ -7,17 +7,17 @@
 #define HTABLE_H
 
 #include <stdlib.h>
-#include "list.h"
+#include "slist.h"
 
 typedef struct Htable {
-	List_node **base;
+	SList_node **base;
 	size_t size;
 	int (*hash_function)(const void *);
 	int (*key_function)(const void *, const void *);
 } Htable;
 
 #define STATIC_HTABLE(name, size, hash_function) \
-	static List_node *name##links[size]; \
+	static SList_node *name##links[size]; \
 	static Htable name = { name##links, size, hash_function }
 
 

@@ -1,36 +1,43 @@
 #ifndef LIST_H
 #define LIST_H
 
-#define STATIC_LIST(name)	List_node *name = NULL;
-
-typedef struct Node {
-	struct Node *next;
+typedef struct List_node {
+	struct List_node *next, *prev;
 	void *data;
 } List_node;
 
-//static inline void list_init(List_node *list) { list->next = list; } 
+void list_init(List_node *p);
 
-void list_destroy(List_node *list);
+List_node *list_create();
 
-List_node *list_insert(List_node *list, void *data);
+void list_destroy(List_node *p);
 
-List_node *list_remove(List_node *list, List_node *node);
+int list_insert_rear(List_node *p, void *data);
 
-List_node *list_insert_sort(List_node *list, void *data,
-	int (*cmp)(const void *, const void *));
+int list_insert_front(List_node *p, void *data);
 
-void list_foreach(List_node *list, void(*do_it)(void*));
+void list_remove(List_node *node);
 
-List_node *list_search_sort(List_node *list, const void *data,
-	int (*fcmp)(const void *, const void *));
+void ist_remove_rear(List_node *p);
 
-List_node *list_search(List_node *list, const void *data,
-	int (*cmp)(const void *, const void *));
+void list_remove_front(List_node *p);
 
-int list_size(List_node *);
+int list_insert_sort(List_node *node, void *data,
+	int (*cmp)(const void*, const void*));
 
-void *list_data(List_node *);
+void list_foreach(List_node *node, void (*do_it)(const void*));
 
-int list_empty(List_node *);
+List_node *list_search(List_node *list,
+		int (*predicate)(const void *, const void *), const void *context);
+
+List_node *list_front(List_node *node);
+
+List_node *list_rear(List_node *node);
+
+int list_empty(List_node *node);
+
+void * list_data(List_node *node);
+
+size_t list_size(List_node *list);
 
 #endif

@@ -4,28 +4,28 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "listdi.h"
+#include "ilist.h"
 
-void list_init(List_node *node) {
+void ilist_init(IList_node *node) {
 	node->next = node->prev = node;
 }
 
-List_node *list_create() {
-	List_node *node = malloc(sizeof(List_node));
+IList_node *ilist_create() {
+	IList_node *node = malloc(sizeof(IList_node));
 	if (node == 0)
 		return 0;
-	list_init(node);
+	ilist_init(node);
 	return node;
 }
 
-void list_destroy(List_node *list) {
+void ilist_destroy(IList_node *list) {
 	assert(list);
 	free(list);
 }
 
 /* node - elemento de referência; new_node - novo elemento */
 
-void list_insert_front(List_node *list, List_node *new_node) {
+void ilist_insert_front(IList_node *list, IList_node *new_node) {
 	assert(list && new_node);
 	new_node->next = list->next;
 	new_node->prev = list;
@@ -33,7 +33,7 @@ void list_insert_front(List_node *list, List_node *new_node) {
 	list->next = new_node;
 }
 
-void list_insert_rear(List_node *list, List_node *new_node) {
+void ilist_insert_rear(IList_node *list, IList_node *new_node) {
 	assert(list && new_node);
 	new_node->prev = list->prev;
 	new_node->next = list;
@@ -41,23 +41,23 @@ void list_insert_rear(List_node *list, List_node *new_node) {
 	list->prev = new_node;
 }
 
-List_node *list_remove_front(List_node *list) {
+IList_node *ilist_remove_front(IList_node *list) {
 	assert(list);
-	List_node *node = list->next;
+	IList_node *node = list->next;
 	list->next = list->next->next;
 	node->next->prev = node->prev;
 	return node;
 }
 
-List_node *list_remove_rear(List_node *list) {
+IList_node *ilist_remove_rear(IList_node *list) {
 	assert(list);
-	List_node *node = list->prev;
+	IList_node *node = list->prev;
 	list->prev = list->prev->prev;
 	node->prev->next = node->next;
 	return node;
 }
 
-void list_remove(List_node *node) {
+void ilist_remove(IList_node *node) {
 	assert(node);
 	if (node->next == node)
 		return;
@@ -66,46 +66,46 @@ void list_remove(List_node *node) {
 	node->next = node->prev = node;
 }
 
-int list_empty(List_node *list) {
+int ilist_empty(IList_node *list) {
 	assert(list);
 	return list->next == list;
 }
 
-List_node *list_rear(List_node *node) {
+IList_node *ilist_rear(IList_node *node) {
 	assert(node);
 	return node->prev;
 }
 
-List_node *list_front(List_node *list) {
+IList_node *ilist_front(IList_node *list) {
 	assert(list);
 	return list->next;
 }
 
-List_node *list_sentinel(List_node *list) {
+IList_node *ilist_sentinel(IList_node *list) {
 	assert(list);
 	return list;
 }
 
-List_node *list_search(List_node *list, const void *key,
-						int (*cmp)(List_node *, const void *)) {
-	for (List_node *p = list->next; p != list; p = p->next)
+IList_node *ilist_search(IList_node *list, const void *key,
+						int (*cmp)(IList_node *, const void *)) {
+	for (IList_node *p = list->next; p != list; p = p->next)
 		if (cmp(p, key) == 0)
 				return p;
 	return NULL;
 }
 
-void list_foreach(List_node *list, void (*opr)(List_node *)) {
-	for (List_node *next, *p = list->next; p != list; p = next) {
+void ilist_foreach(IList_node *list, void (*opr)(IList_node *)) {
+	for (IList_node *next, *p = list->next; p != list; p = next) {
 		next = p->next;
 		opr(p);
 	}
 }
 
-int list_size(List_node *list) {
+int ilist_size(IList_node *list) {
 	int counter = 0;
-	List_node * link;
-	for (link = list_front(list);
-			link != list_sentinel(list); link = list_front(link))
+	IList_node * link;
+	for (link = ilist_front(list);
+			link != ilist_sentinel(list); link = ilist_front(link))
 		counter++;
 	return counter;
 }

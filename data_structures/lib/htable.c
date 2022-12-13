@@ -31,14 +31,14 @@ Htable *htable_create(size_t size,
 void htable_destroy(Htable *htable) {
 	for (size_t i = 0; i < htable->size; ++i)
 		if (htable->base[i] != NULL)
-			list_destroy(htable->base[i]);
+			slist_destroy(htable->base[i]);
 	free(htable->base);
 	free(htable);
 }
 
 int htable_insert(Htable *htable, const void *key, void *data) {
 	int index = htable->hash_function(key) % htable->size;
-	htable->base[index] = list_insert(htable->base[index], data);
+	htable->base[index] = slist_insert(htable->base[index], data);
 	return htable->base[index] != NULL;
 }
 
@@ -46,34 +46,34 @@ void htable_remove(Htable *htable, const void *key) {
 	int index = htable->hash_function(key) % htable->size;
 	if (NULL == htable->base[index])
 		return;
-	List_node *node = list_search(htable->base[index],
+	SList_node *node = slist_search(htable->base[index],
 								key, htable->key_function);
 	if (NULL != node)
-		htable->base[index] = list_remove(htable->base[index], node);
+		htable->base[index] = slist_remove(htable->base[index], node);
 }
 
 void *htable_lookup(Htable *htable, const void *key) {
 	int index = htable->hash_function(key) % htable->size;
 	if (NULL == htable->base[index])
 		return NULL;
-	List_node *node = list_search(htable->base[index],
+	SList_node *node = slist_search(htable->base[index],
 									key, htable->key_function);
 	if (node != NULL)
-		return list_data(node);
+		return slist_data(node);
 	return NULL;
 }
 
 void htable_foreach(Htable *htable, void (*do_it)(void*)) {
 	for (size_t i = 0; i < htable->size; ++i)
 		if (htable->base[i] != NULL)
-			list_foreach(htable->base[i], do_it);
+			slist_foreach(htable->base[i], do_it);
 }
 
 size_t htable_size(Htable *htable) {
 	int i, counter = 0;
 	for (i = 0; i < htable->size; ++i)
 		if (NULL != htable->base[i])
-			counter += list_size(htable->base[i]);
+			counter += slist_size(htable->base[i]);
 	return counter;
 }
 
@@ -81,7 +81,7 @@ int htable_collisions(Htable * htable) {
 	int i, max_collisions = 0;
 	for (i = 0; i < htable->size; ++i) {
 		if (NULL != htable->base[i]) {
-			int collisions = list_size(htable->base[i]);
+			int collisions = slist_size(htable->base[i]);
 			if (collisions > max_collisions)
 				max_collisions = collisions;
 		}
