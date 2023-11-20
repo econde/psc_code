@@ -1,30 +1,27 @@
 /*
 	Programa para simular uma fila de espera
 
-	Objectivo: exemplificar a utilização de uma lista ligada
-				e a alocação dinâmica.
-
-	Criando diretamente uma lista simplesmente ligada
+	Utilização da lista duplamente ligada pertencete à biblioteca Glib
+	https://docs.gtk.org/glib/index.html
 */
-
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
+#include <glib.h>
 
 /*-----------------------------------------------------------------------------
 	Representa um utente na fila de espera
  */
-typedef struct user {
-	struct user *next;
+typedef struct User {
 	time_t arrival;
 	char *name;
 } User;
 
 /*-----------------------------------------------------------------------------
-	A fila de espera é representada por estes dois ponteiros
+	A fila de espera
  */
-static User *head = NULL, *tail = NULL;
+static GList *queue = NULL;
 
 /*-----------------------------------------------------------------------------
 	Função para insertir um novo utente na fila de espera
@@ -43,25 +40,18 @@ static void user_insert(char *name) {
 	}
 	strcpy(user->name, name);
 	time(&user->arrival);
-	user->next = NULL;
-	if (NULL == head)
-		head = tail = user;
-	else {
-		tail->next = user;
-		tail = user;
-	}
+	queue = g_list_insert_before(queue, NULL, user);
 }
 
 /*-----------------------------------------------------------------------------
 	Função para remover da fila o primeiro utente a ser atendido
  */
 char *user_answer() {
-	if (NULL == head)
+	if (g_list_length(queue) == 0)
 		return NULL;
-	User *user = head;
-	head = head->next;
-	tail = NULL == head ? NULL : tail;
-
+	GList *node = g_list_first(queue);
+	User *user = node->data;
+	queue = g_list_delete_link(queue, node);
 	char *name = user->name;
 	free(user);
 	return name;
@@ -70,48 +60,50 @@ char *user_answer() {
 /*-----------------------------------------------------------------------------
 	Função para remover um utente da fila de espera, por desistencia
  */
+static int cmp(const void *a, const void *b) {
+	return strcmp(((User *)a)->name, (char *)b);
+}
+
 static void user_remove(char *name) {
-	if (NULL == head)
+	if (g_list_length(queue) == 0)
 		return;
-	User *prev = NULL;
-	for (User *user = head; user != NULL; prev = user, user = user->next)
-		if (strcmp(name, user->name) == 0){
-			if (NULL == prev) {
-				head = user->next;
-				tail = NULL == head ? NULL : tail;
-			}
-			else {
-				prev->next = user->next;
-				tail = NULL == prev->next ? prev : tail;
-			}
-			free(user->name);
-			free(user);
-			return;
-		}
+	GList *node = g_list_find_custom(queue, name, cmp);
+	if (node == NULL)
+		return;
+	User *user = node->data;
+	queue = g_list_delete_link(queue, node);
+	free(user->name);
+	free(user);
 }
 
 /*-----------------------------------------------------------------------------
 	Listar os utentes na fila de espera.
  */
+
+static void print(void *user, void *not_used) {
+	printf("Nome: %s, %ld\n", ((User *)user)->name,
+			time(NULL) - ((User *)user)->arrival);
+}
+
 void user_print() {
-	if (NULL == head) {
+	if (g_list_length(queue) == 0) {
 		printf("Fila vazia\n");
 		return;
 	}
-	int i = 1;
-	for (User *user = head; user != NULL; user = user->next)
-		printf("%d: %s, %ld\n", i++, user->name, time(NULL) - user->arrival);
+	g_list_foreach(queue, print, NULL);
 }
 
 /*-----------------------------------------------------------------------------
 	Vazar a lista libertando toda a memória alocada.
  */
+
+void free_user(void *user) {
+	free(((User *)user)->name);
+	free(user);
+}
+
 void user_leak_queue() {
-	for (User *next, *p = head; p != NULL; p = next) {
-		next = p->next;
-		free(p->name);
-		free(p);
-	}
+	g_list_free_full(queue, free_user);
 }
 
 static void help() {

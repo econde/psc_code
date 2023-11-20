@@ -71,12 +71,15 @@ static void user_insert(char *name) {
 char *user_answer() {
 	if (&queue == queue.next)
 		return NULL;
+	User *user = queue.next->data;
+
 	List_node *node = queue.next;
 	node->next->prev = node->prev;
 	node->prev->next = node->next;
-	char *name = ((User *)node->data)->name;
-	free(node->data);
 	free(node);
+
+	char *name = user->name;
+	free(user);
 	return name;
 }
 

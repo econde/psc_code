@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "listd.h"
+#include "list.h"
 
 /*-----------------------------------------------------------------------------
 	Representa um utente na fila de espera
@@ -72,7 +72,7 @@ static int cmp(const void *a, const void *b) {
 static void user_remove(char *name) {
 	if (list_empty(queue))
 		return;
-	List_node *node = list_search(queue, name, cmp);
+	List_node *node = list_search(queue, cmp, name);
 	if (node == NULL)
 		return;
 	User *user = list_data(node);
