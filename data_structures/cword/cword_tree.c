@@ -4,6 +4,8 @@
 #include <errno.h>
 #include <time.h>
 
+char *wordread(FILE *file, char *separators);
+
 unsigned int get_time() {
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -20,26 +22,6 @@ typedef struct Word {
  */
 char *separators = " .,;!?\t\n\f:-\"\'(){}[]*=%><#+-&";
 
-char *word_read(FILE *fd){
-	static char buffer[100];
-	int i = 0, c;
-	do {
-		c = fgetc(fd);
-		if(c == EOF){
-			return NULL;
-		}
-	}
-	while (strchr(separators, c) != NULL);
-	do {
-		buffer[i++] = c;
-		c = fgetc(fd);
-		if(c == EOF)
-			break;
-	} while (strchr(separators, c) == NULL);
-	buffer[i] = '\0';
-	return buffer;
-}
-
 static inline int min(int a, int b) {
 	return a < b ? a : b;
 }
@@ -48,7 +30,7 @@ static inline int min(int a, int b) {
 
 Tree_node *words;
 
-int word_cmp_text(void *a, void *b) {
+int word_cmp_text(const void *a, const void *b) {
 	return strcmp(((Word *)a)->text, ((Word*)b)->text);
 }
 
@@ -62,13 +44,13 @@ int main(int argc, char *argv[]) {
 	if (NULL == fd) {
 		fprintf(stderr, "fopen(%s, \"r\"): %s\n",
 				argv[1], strerror(errno));
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	int nwords = 0;
 	words = NULL;
 	long initial = get_time();
-	char *word_text = word_read(fd);
-	while(word_text != NULL) {
+	char *word_text;
+	while((word_text = wordread(fd, separators)) != NULL) {
 		nwords++;
 		Word key = {.text = word_text};
 		Tree_node *node = tree_search(words, &key, word_cmp_text);
@@ -78,11 +60,18 @@ int main(int argc, char *argv[]) {
 		}
 		else {
 			Word *word = malloc(sizeof(Word));
+			if (word == NULL) {
+				fprintf(stderr, "Out of memory\n");
+				exit(EXIT_FAILURE);
+			}
 			word->counter = 1;
 			word->text = strdup(word_text);
+			if (word->text == NULL) {
+				fprintf(stderr, "Out of memory\n");
+				exit(EXIT_FAILURE);
+			}
 			words = tree_insert(words, word, word_cmp_text);
 		}
-		word_text = word_read(fd);
 	}
 	long duration = get_time() - initial;
 	printf("Total de palavras = %d; "

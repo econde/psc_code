@@ -63,10 +63,10 @@ void *htable_lookup(Htable *htable, const void *key) {
 	return NULL;
 }
 
-void htable_foreach(Htable *htable, void (*do_it)(void*)) {
+void htable_foreach(Htable *htable, void (*do_it)(void*, void *), void *context) {
 	for (size_t i = 0; i < htable->size; ++i)
 		if (htable->base[i] != NULL)
-			slist_foreach(htable->base[i], do_it);
+			slist_foreach(htable->base[i], do_it, context);
 }
 
 size_t htable_size(Htable *htable) {

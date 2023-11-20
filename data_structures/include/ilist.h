@@ -1,41 +1,41 @@
 #ifndef ILIST_H
 #define ILIST_H
 
-typedef struct IList_node {
-	struct IList_node *next, *prev;
-} IList_node;
+typedef struct Ilist_node {
+	struct Ilist_node *next, *prev;
+} Ilist_node;
 
-#define STATIC_LIST(name)	IList_node name = {&name, &name};
+#define STATIC_LIST(name)	Ilist_node name = {&name, &name};
 
-void ilist_init(IList_node *node);
+void ilist_init(Ilist_node *node);
 
-IList_node *ilist_create();
+Ilist_node *ilist_create();
 
-void ilist_destroy(IList_node *list);
+void ilist_destroy(Ilist_node *list);
 
-void ilist_insert_rear(IList_node *list, IList_node *new_node);
+void ilist_insert_rear(Ilist_node *list, Ilist_node *new_node);
 
-void ilist_insert_front(IList_node *list, IList_node *new_node);
+void ilist_insert_front(Ilist_node *list, Ilist_node *new_node);
 
-IList_node * ilist_remove_rear(IList_node *list);
+Ilist_node * ilist_remove_rear(Ilist_node *list);
 
-IList_node * ilist_remove_front(IList_node *list);
+Ilist_node * ilist_remove_front(Ilist_node *list);
 
-void ilist_remove(IList_node *node);
+void ilist_remove(Ilist_node *node);
 
-int ilist_empty(IList_node *list);
+int ilist_empty(Ilist_node *list);
 
-IList_node * ilist_front(IList_node *list);
+Ilist_node * ilist_front(Ilist_node *list);
 
-IList_node * ilist_rear(IList_node *list);
+Ilist_node * ilist_rear(Ilist_node *list);
 
-IList_node * ilist_sentinel(IList_node *list);
+Ilist_node * ilist_sentinel(Ilist_node *list);
 
-IList_node * ilist_search(IList_node *list, const void *key,
-						int (*cmp)(IList_node *, const void *));
+Ilist_node * ilist_search(Ilist_node *list, const void *key,
+						int (*cmp)(Ilist_node *, const void *));
 
-void ilist_foreach(IList_node *node, void (*do_it)(IList_node *));
+void ilist_foreach(Ilist_node *node, void (*do_it)(Ilist_node *));
 
-int ilist_size(IList_node *list);
+int ilist_size(Ilist_node *list);
 
 #endif

@@ -6,6 +6,8 @@
 
 #include "list.h"
 
+char *wordread(FILE *file, char *separators);
+
 unsigned int get_time() {
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -13,24 +15,6 @@ unsigned int get_time() {
 }
 
 char *separators = " .,;!?\t\n\f:-\"\'(){}[]*=%><#+-&";
-
-char *word_read(FILE *fd) {
-	static char buffer[100];
-	int i = 0, c;
-	do {
-		c = fgetc(fd);
-		if (c == EOF)
-			return NULL;
-	} while (strchr(separators, c) != NULL);
-	do {
-		buffer[i++] = c;
-		c = fgetc(fd);
-		if (c == EOF)
-			break;
-	} while (strchr(separators, c) == NULL && i < sizeof buffer);
-	buffer[i] = '\0';
-	return buffer;
-}
 
 typedef struct Word {
 	char *text;
@@ -43,7 +27,7 @@ int word_cmp(const void *data, const void *word_text) {
 	return strcmp(((Word*)data)->text, (char *)word_text) == 0;
 }
 
-void free_word(const void *data) {
+void free_word(void *data) {
 	free(((Word*)data)->text);
 	free((void *)data);
 }
@@ -63,8 +47,8 @@ int main(int argc, char *argv[]) {
 	words = list_create();
 
 	long initial = get_time();
-	char *word_text = word_read(fd);
-	while (word_text != NULL) {
+	char *word_text;
+	while ((word_text = wordread(fd, separators)) != NULL) {
 		nwords++;
 		List_node *node = list_search(words, word_cmp, word_text);
 		if (node != NULL) {
@@ -74,19 +58,18 @@ int main(int argc, char *argv[]) {
 			Word *new_word = malloc(sizeof *new_word);
 			if (new_word == NULL) {
 				fprintf(stderr, "Out of memory\n");
-				exit(-1);
+				exit(EXIT_FAILURE);
 			}
 			/* new_word->text = word_text; ERRO */
 			new_word->counter = 1;
 			new_word->text = malloc(strlen(word_text) + 1);
 			if (new_word->text == NULL) {
 				fprintf(stderr, "Out of memory\n");
-				exit(-1);
+				exit(EXIT_FAILURE);
 			}
-			strcpy(new_word->text, word_text);
+			strcpy(new_word->text, word_text);	// strdup
 			list_insert_rear(words, new_word);
 		}
-		word_text = word_read(fd);
 	}
 	long duration = get_time() - initial;
 	printf("Total de palavras = %d; "

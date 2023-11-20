@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
-#include "vector.h"
+#include "vector_ptr.h"
 
 char *wordread(FILE *file, char *separators);
 
@@ -24,22 +24,23 @@ static inline int min(int a, int b) {
 	return a < b ? a : b;
 }
 
-Vector *words;
+PVector *words;
 
 int word_cmp_text(const void *a, const void *b) {
-	return strcmp(((Word *)a)->text, (const char *)b);
+	return strcmp((*(Word **)a)->text, (const char *)b);
 }
 
 int word_cmp_count(const void *a, const void *b) {
-	return ((Word *)a)->counter - ((Word *)b)->counter;
+	return (*(Word **)a)->counter - (*(Word **)b)->counter;
 }
 
 int word_cmp_count_decrease(const void *a, const void *b) {
-	return ((Word *)b)->counter - ((Word *)a)->counter;
+	return (*(Word **)b)->counter - (*(Word **)a)->counter;
 }
 
-void free_word(void *data) {
+void free_words(void *data) {
 	free(((Word *)data)->text);
+	free(data);
 }
 
 int main(int argc, char *argv[]){
@@ -47,42 +48,47 @@ int main(int argc, char *argv[]){
 	if (NULL == fd) {
 		fprintf(stderr, "fopen(%s, \"r\"): %s\n",
 				argv[1], strerror(errno));
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	int nwords = 0;
-	words = vector_create(sizeof (Word), 2);
+	words = pvector_create(1000);
 	long initial = get_time();
 	char *word_text;
 	while ((word_text = wordread(fd, separators)) != NULL) {
 		nwords++;
 		size_t index;
-		if (vector_sorted_search(words, word_text,
-						word_cmp_text, &index)) {
-			Word *w = vector_at(words, index);
+		if (pvector_sorted_search(words, word_text,
+					word_cmp_text, &index)) {
+			Word *w = pvector_at(words, index);
 			w->counter++;
 		}
 		else {
-			Word w = { .counter = 1 };
-			w.text = strdup(word_text);
-			if (w.text == NULL) {
+			Word *w = malloc(sizeof(Word));
+			if (w == NULL) {
 				fprintf(stderr, "Out of memory\n");
 				exit(EXIT_FAILURE);
 			}
-			vector_insert(words, &w, index);
+			w->counter = 1;
+			w->text = strdup(word_text);
+			if (w->text == NULL) {
+				fprintf(stderr, "Out of memory\n");
+				exit(EXIT_FAILURE);
+			}
+			pvector_insert(words, w, index);
 		}
 	}
 	long duration = get_time() - initial;
 	fclose(fd);
 	printf("Total de palavras = %d; "
 		   "Palavras diferentes = %ld Time = %ld\n",
-		    nwords, vector_size(words), duration);
-	vector_sort(words, word_cmp_count_decrease);
-	for(size_t i = 0; i < min(10, vector_size(words)); ++i) {
-//	for(size_t i = 0; i < vector_size(words); ++i) {
-		Word *w = vector_at(words, i);
+		    nwords, pvector_size(words), duration);
+	pvector_sort(words, word_cmp_count_decrease);
+	for(size_t i = 0; i < min(10, pvector_size(words)); ++i) {
+//	for(size_t i = 0; i < pvector_size(words); ++i) {
+		Word *w = pvector_at(words, i);
 		printf("%s - %d\n", w->text, w->counter);
 	}
-	vector_foreach(words, free_word);
-	vector_destroy(words);
+	pvector_foreach(words, free_words);
+	pvector_destroy(words);
 }
 

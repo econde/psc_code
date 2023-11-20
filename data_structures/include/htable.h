@@ -37,7 +37,7 @@ void htable_remove(Htable *htable, const void *key);
 
 void *htable_lookup(Htable *htable, const void *key);
 
-void htable_foreach(Htable *, void (*do_it)(void*));
+void htable_foreach(Htable *, void (*do_it)(void*, void*), void *context);
 
 size_t htable_size(Htable *table);
 

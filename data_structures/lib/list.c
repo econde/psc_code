@@ -77,7 +77,7 @@ void list_remove_rear(List_node *node) {
 	list_remove(node->prev);
 }
 
-void list_foreach(List_node *node, void (*do_it)(const void*)) {
+void list_foreach(List_node *node, void (*do_it)(void*)) {
 	for (List_node *p = node->next; p != node; p = p->next)
 		do_it(p->data);
 }

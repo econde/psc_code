@@ -16,13 +16,13 @@ SList_node *slist_insert(SList_node *list, void *data);
 
 SList_node *slist_remove(SList_node *list, SList_node *node);
 
-SList_node *slist_insert_sort(SList_node *list, void *data,
-	int (*cmp)(const void *, const void *));
+SList_node *slist_insert_sort(SList_node *list,
+	int (*cmp)(const void *, const void *), void *data);
 
-void slist_foreach(SList_node *list, void(*do_it)(void*));
+void slist_foreach(SList_node *list, void(*do_it)(void*, void *), void *context);
 
-SList_node *slist_search_sort(SList_node *list, const void *data,
-	int (*fcmp)(const void *, const void *));
+SList_node *slist_search_sort(SList_node *list,
+	int (*fcmp)(const void *, const void *), const void *data);
 
 SList_node *slist_search(SList_node *list, const void *data,
 	int (*cmp)(const void *, const void *));

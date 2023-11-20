@@ -8,8 +8,8 @@ void slist_destroy(SList_node *list) {
 	}
 }
 
-SList_node *slist_insert_sort(SList_node *list, void *data,
-	int (*fcmp)(const void *, const void *)) {
+SList_node *slist_insert_sort(SList_node *list,
+	int (*fcmp)(const void *, const void *), void *data) {
 	SList_node *node = malloc(sizeof (*node));
 	if (NULL == node)
 		return NULL;
@@ -17,7 +17,7 @@ SList_node *slist_insert_sort(SList_node *list, void *data,
 	node->next = NULL;
 	if (list == NULL)						/*	Primeiro elemento */
 		;
-	else if (fcmp(list->data, data) <= 0) {	/* Inserção antes do primeiro elemento */
+	else if (fcmp(list->data, data) > 0) {	/* Inserção antes do primeiro elemento */
 		node->next = list;
 	}
 	else {
@@ -59,13 +59,13 @@ SList_node *slist_remove(SList_node *list, SList_node *node) {
 	return list;
 }
 
-void slist_foreach(SList_node *list, void(*do_it)(void *)) {
+void slist_foreach(SList_node *list, void(*do_it)(void *, void *), void *context) {
 	for (SList_node * p = list; p != NULL; p = p->next)
-		do_it(p->data);
+		do_it(p->data, context);
 }
 
-SList_node *slist_search_sort(SList_node *list, const void *data,
-							int (*fcmp)(const void *, const void *)) {
+SList_node *slist_search_sort(SList_node *list,
+							int (*fcmp)(const void *, const void *), const void *data) {
 	for (SList_node *p = list; p != NULL; p = p->next) {
 		int tmp = fcmp(p->data, data);
 		if (tmp == 0)

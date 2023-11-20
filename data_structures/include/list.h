@@ -25,7 +25,7 @@ void list_remove_front(List_node *p);
 int list_insert_sort(List_node *node, void *data,
 	int (*cmp)(const void*, const void*));
 
-void list_foreach(List_node *node, void (*do_it)(const void*));
+void list_foreach(List_node *node, void (*do_it)(void*));
 
 List_node *list_search(List_node *list,
 		int (*predicate)(const void *, const void *), const void *context);
