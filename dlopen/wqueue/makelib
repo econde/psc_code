@@ -1,0 +1,8 @@
+libpurge.so: purge.o
+	gcc -shared purge.o -o libpurge.so
+
+purge.o: purge.c
+	gcc -c -fpic purge.c
+
+clean:
+	rm -rf *.o libpurge.so
