@@ -16,6 +16,8 @@ SList_node *slist_insert(SList_node *list, void *data);
 
 SList_node *slist_remove(SList_node *list, SList_node *node);
 
+SList_node *slist_remove_head(SList_node *list);
+
 SList_node *slist_insert_sort(SList_node *list,
 	int (*cmp)(const void *, const void *), void *data);
 

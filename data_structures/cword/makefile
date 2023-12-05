@@ -1,5 +1,5 @@
 
-CFLAGS = -c -g -Werror -Wall -pedantic -I../include
+CFLAGS = -c -g -Werror -Wall -I../include
 
 LFLAGS=
 

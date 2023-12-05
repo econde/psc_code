@@ -52,22 +52,39 @@ int cmp_counter(const void *data, const void *context) {
 	Word *ref = (Word *)data;
 	Word *new = (Word *)context;
 	if (ref->counter > new->counter)
-		return -1;
+		return +1;
 	else if (ref->counter < new->counter)
-		return 1;
+		return -1;
 	return 0;
 }
 
-void insert_in_list(void *data, void *context) {
-	SList_node *list = *(SList_node **)context;
-	list = slist_insert_sort(list, cmp_counter, data);
-	*(SList_node **)context = list;
+//------------------------------------------------------------------------------
+
+typedef struct Top_ten {
+	SList_node *list;
+	int lower_counter;
+	int list_size;
+} Top_ten;
+
+static void insert_in_list(void *data, void *context) {
+	Top_ten *stuff = (Top_ten*)context;
+	Word *word = (Word *)data;
+	if (stuff->list_size < 10) {
+		stuff->list = slist_insert_sort(stuff->list, cmp_counter, data);
+		stuff->list_size++;
+		stuff->lower_counter = ((Word *)slist_data(stuff->list))->counter;
+	}
+	else if (word->counter > stuff->lower_counter) {
+		stuff->list = slist_insert_sort(stuff->list, cmp_counter, data);
+		stuff->list = slist_remove_head(stuff->list);
+		stuff->lower_counter = ((Word *)slist_data(stuff->list))->counter;
+	}
 }
 
-SList_node *htable_to_sortedlist(Htable *htable) {
-	SList_node *list = NULL;
-	htable_foreach(htable, insert_in_list, &list);
-	return list;
+static SList_node *htable_to_sortedlist(Htable *htable) {
+	Top_ten stuff = { NULL, 0, 0 };
+	htable_foreach(htable, insert_in_list, &stuff);
+	return stuff.list;
 }
 
 int main(int argc, char *argv[]){
@@ -75,7 +92,7 @@ int main(int argc, char *argv[]){
 	if (NULL == fd) {
 		fprintf(stderr, "fopen(%s, \"r\"): %s\n",
 				argv[1], strerror(errno));
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	int nwords = 0;
 	htable = htable_create(10000, hash_function, word_cmp_text);
@@ -114,15 +131,5 @@ int main(int argc, char *argv[]){
 	htable_destroy(htable);
 }
 
-#if 0
-void (void *data) {
-	Word *word = (Word *)data;
-}
-
-Vector *htable_to_vector(Htable *htable) {
-	Vector *vector = vector_create();
-	htable_foreach(htable,
-}
-#endif
 
 

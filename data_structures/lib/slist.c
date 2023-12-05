@@ -41,6 +41,12 @@ SList_node *slist_insert(SList_node *list, void *data) {
 	return node;
 }
 
+SList_node *slist_remove_head(SList_node *list) {
+	SList_node *next = list->next;
+	free(list);
+	return next;
+}
+
 SList_node *slist_remove(SList_node *list, SList_node *node) {
 	if (node == NULL || list == NULL)
 		return list;
