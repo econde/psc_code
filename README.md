@@ -1,2 +1,2 @@
 # psc_code
-Exemplos de código utilizados em PSC
+Exemplos de código que utilizo em PSC.
