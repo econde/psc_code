@@ -1,0 +1,13 @@
+CFLAGS=-c -g -Og -Werror -Wall
+
+libdemo.a: stack.o fifo.o
+	ar cr libdemo.a stack.o fifo.o
+
+stack.o: stack.c
+	gcc $(CFLAGS) stack.c -o stack.o
+
+fifo.o: fifo.c
+	gcc $(CFLAGS) fifo.c -o fifo.o
+
+clean:
+	rm fifo.o stack.o libdemo.a
